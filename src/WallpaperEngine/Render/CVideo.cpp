@@ -24,8 +24,8 @@ CVideo::CVideo (Core::CVideo* video, CRenderContext& context, CAudioContext& aud
     if (this->m_mpv == nullptr)
         sLog.exception ("Could not create mpv context");
 
-    mpv_set_option_string (this->m_mpv, "terminal", "yes");
-    mpv_set_option_string (this->m_mpv, "msg-level", "all=v");
+    mpv_set_option_string (this->m_mpv, "terminal", "no");
+    mpv_set_option_string (this->m_mpv, "msg-level", "all=no");
     mpv_set_option_string (this->m_mpv, "input-cursor", "no");
     mpv_set_option_string (this->m_mpv, "cursor-autohide", "no");
     mpv_set_option_string (this->m_mpv, "config", "no");
@@ -35,8 +35,14 @@ CVideo::CVideo (Core::CVideo* video, CRenderContext& context, CAudioContext& aud
         sLog.exception ("Could not initialize mpv context");
 
     mpv_set_option_string (this->m_mpv, "hwdec", "auto");
+    mpv_set_option_string (this->m_mpv, "fs", "yes");
     mpv_set_option_string (this->m_mpv, "loop", "inf");
-    mpv_set_option (this->m_mpv, "volume", MPV_FORMAT_DOUBLE, &volume);
+
+    if (volume > 0.0) {
+        mpv_set_option_string(this->m_mpv, "mute", "yes");
+    } else {
+        mpv_set_option (this->m_mpv, "volume", MPV_FORMAT_DOUBLE, &volume);
+    }
 
     // initialize gl context for mpv
     mpv_opengl_init_params gl_init_params {get_proc_address, this};
