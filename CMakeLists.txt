@@ -11,7 +11,7 @@ if(NOT ERRORONLY)
     set(ERRORONLY 0)
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-narrowing")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -O3 -pipe -Wno-narrowing")
 
 # if you're developing you might find this debug option useful for shader output, although RenderDoc is encouraged
 add_compile_definitions(ERRORONLY=${ERRORONLY})
