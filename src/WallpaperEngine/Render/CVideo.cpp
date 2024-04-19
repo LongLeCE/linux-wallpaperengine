@@ -26,8 +26,10 @@ CVideo::CVideo (Core::CVideo* video, CRenderContext& context, CAudioContext& aud
 
     mpv_set_option_string (this->m_mpv, "terminal", "no");
     mpv_set_option_string (this->m_mpv, "msg-level", "all=no");
+    mpv_set_option_string (this->m_mpv, "input-default-bindings", "no");
     mpv_set_option_string (this->m_mpv, "input-cursor", "no");
     mpv_set_option_string (this->m_mpv, "cursor-autohide", "no");
+    mpv_set_option_string (this->m_mpv, "vo", "libmpv");
     mpv_set_option_string (this->m_mpv, "config", "no");
     mpv_set_option_string (this->m_mpv, "fbo-format", "rgba8");
 
@@ -35,10 +37,9 @@ CVideo::CVideo (Core::CVideo* video, CRenderContext& context, CAudioContext& aud
         sLog.exception ("Could not initialize mpv context");
 
     mpv_set_option_string (this->m_mpv, "hwdec", "auto");
-    mpv_set_option_string (this->m_mpv, "fs", "yes");
     mpv_set_option_string (this->m_mpv, "loop", "inf");
 
-    if (volume > 0.0) {
+    if (!this->getContext ().getApp ().getContext ().settings.audio.enabled || volume == 0.0) {
         mpv_set_option_string(this->m_mpv, "mute", "yes");
     } else {
         mpv_set_option (this->m_mpv, "volume", MPV_FORMAT_DOUBLE, &volume);
@@ -61,12 +62,6 @@ CVideo::CVideo (Core::CVideo* video, CRenderContext& context, CAudioContext& aud
 
     if (mpv_command (this->m_mpv, command) < 0)
         sLog.exception ("Cannot load video to play");
-
-    if (!this->getContext ().getApp ().getContext ().settings.audio.enabled) {
-        const char* mutecommand [] = {"set", "mute", "yes", nullptr};
-
-        mpv_command (this->m_mpv, mutecommand);
-    }
 
     // setup framebuffers
     this->setupFramebuffers ();
