@@ -194,7 +194,7 @@ class CAudioStream {
 #if FF_API_FIFO_OLD_API
         AVFifo* packetList;
 #else
-        AVFifoBuffer* packetList;
+        AVBuffer* packetList;
 #endif
         int nb_packets;
         int size;
