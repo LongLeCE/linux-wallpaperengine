@@ -179,12 +179,8 @@ void CAudioStream::loadCustomContent (const char* filename) {
 }
 
 void CAudioStream::initialize () {
-#if FF_API_FIFO_OLD_API
     // allocate the FIFO buffer
     this->m_queue->packetList = av_fifo_alloc2 (1, sizeof (MyAVPacketList), AV_FIFO_FLAG_AUTO_GROW);
-#else
-    this->m_queue->packetList = av_fifo_alloc (sizeof (MyAVPacketList));
-#endif
 
     int64_t out_channel_layout;
 
@@ -244,17 +240,8 @@ void CAudioStream::queuePacket (AVPacket* pkt) {
 bool CAudioStream::doQueue (AVPacket* pkt) {
     MyAVPacketList entry {pkt};
 
-#if FF_API_FIFO_OLD_API
-    // write the entry if possible
     if (av_fifo_write (this->m_queue->packetList, &entry, 1) < 0)
         return false;
-#else
-    if (av_fifo_space (this->m_queue->packetList) < sizeof (entry))
-        if (av_fifo_grow (this->m_queue->packetList, sizeof (entry)) < 0)
-            return false;
-
-    av_fifo_generic_write (this->m_queue->packetList, &entry, sizeof (entry), nullptr);
-#endif
 
     this->m_queue->nb_packets++;
     this->m_queue->size += entry.packet->size + sizeof (entry);
@@ -272,14 +259,7 @@ void CAudioStream::dequeuePacket (AVPacket* output) {
 
     while (this->m_audioContext.getApplicationContext ().state.general.keepRunning) {
 
-#if FF_API_FIFO_OLD_API
         int ret = av_fifo_read (this->m_queue->packetList, &entry, 1);
-#else
-        int ret = -1;
-
-        if (av_fifo_size (this->m_queue->packetList) >= sizeof (entry))
-            ret = av_fifo_generic_read (this->m_queue->packetList, &entry, sizeof (entry), nullptr);
-#endif
 
         // enough data available, read it
         if (ret >= 0) {
