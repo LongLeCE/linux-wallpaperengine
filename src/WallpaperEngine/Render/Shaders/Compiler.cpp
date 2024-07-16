@@ -614,7 +614,6 @@ void Compiler::parseComboConfiguration (const std::string& content, int defaultV
 
     std::cout << "type: " << *type << "\n";
     std::cout << "entry: " << *combo->get<std::string> () << "\n";
-    std::cout << "combo: " << *this->m_combos->end () << "\n";
 
     // check the combos
     const auto entry = this->m_combos->find (combo->get<std::string> ());
