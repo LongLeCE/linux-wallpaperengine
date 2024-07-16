@@ -612,9 +612,6 @@ void Compiler::parseComboConfiguration (const std::string& content, int defaultV
     // add line feed just in case
     this->m_compiledContent += "\n";
 
-    std::cout << "type: " << *type << "\n";
-    std::cout << "entry: " << *combo->get<std::string> () << "\n";
-
     // check the combos
     const auto entry = this->m_combos->find (combo->get<std::string> ());
 
