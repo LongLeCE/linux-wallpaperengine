@@ -234,7 +234,22 @@ CApplicationContext::CApplicationContext (int argc, char* argv []) {
 
     if (this->settings.general.defaultBackground.empty ()) {
         if (optind < argc && strlen (argv [optind]) > 0) {
-            this->settings.general.defaultBackground = translateBackground (argv [optind]);
+            size_t totalLength = 0;
+            for (int i = optind; i < argc; ++i)
+                totalLength += std::strlen(argv[i]);
+            std::vector<char> buffer(totalLength + argc - optind);
+            char *ptr = buffer.data();
+            for (int i = optind; i < argc; ++i) {
+                size_t len = std::strlen(argv[i]);
+                std::memcpy(ptr, argv[i], len);
+                ptr += len;
+                if (i < argc - 1) {
+                    *ptr = ' ';
+                    ++ptr;
+                }
+            }
+            *ptr = '\0';
+            this->settings.general.defaultBackground = translateBackground (buffer.data());
         }
     }
 
